@@ -9,5 +9,5 @@ interface IUserRepository {
 
 	public function getFromId( int $id ): ?IUser;
 
-	public function saveUser( IUser $user ): bool;
+	public function saveUser( IUser $user ): ?IUser;
 }
