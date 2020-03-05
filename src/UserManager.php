@@ -9,6 +9,7 @@ class UserManager {
 	protected $repo;
 
 	protected $passwordPolicy;
+	protected $usernamePolicy;
 
 	public function __construct( IUserRepository $repo, $options ) {
 		$this->repo = $repo;
@@ -17,6 +18,7 @@ class UserManager {
 	}
 
 	public function getUserByUsername( string $username ): IUser {
+		$this->verifyUsername( $username );
 		$user = $this->repo->getFromUsername( $username );
 
 		return $user ?? new User( $username );
@@ -26,9 +28,17 @@ class UserManager {
 		return $this->repo->getFromId( $id );
 	}
 
+	public function usernameExists( string $username ) {
+		return $this->getUserByUsername( $username )->exists();
+	}
+
+	public function emailExists( string $email ) {
+		return $this->repo->getFromEmail( $email ) !== null;
+	}
+
 	public function saveUser( IUser $user ): ?IUser {
 		if ( $user->exists() ) {
-			return $this->repo->updateUser( $user ) ? $user : false;
+			return $this->repo->updateUser( $user ) ? $user : null;
 		}
 		$id = $this->repo->insertUser( $user );
 
@@ -68,6 +78,16 @@ class UserManager {
 		return $this->passwordValid( $password ) && $savedHash === md5( $password );
 	}
 
+	private function verifyUsername( string $username ) {
+		if ( !$this->checkUsername( $username ) ) {
+			throw new Exception( 'Username ' . $username . ' is not valid' );
+		}
+	}
+
+	public function checkUsername( string $username ) {
+		return (bool) preg_match( $this->usernamePolicy['pattern'], $username );
+	}
+
 	public function passwordValid( $password ) {
 		return (bool) preg_match( $this->passwordPolicy['pattern'], $password );
 	}
@@ -76,11 +96,15 @@ class UserManager {
 		$defaults = [
 			'passwordPolicy' => [
 				'pattern' => '/(?=.{8,})(?=.*[A-Z])/'
+			],
+			'usernamePolicy' => [
+				'pattern' => '/(?=.{8,})/'
 			]
 		];
 
 		$options = array_replace_recursive( $defaults, $options );
 
 		$this->passwordPolicy = $options['passwordPolicy'];
+		$this->usernamePolicy = $options['usernamePolicy'];
 	}
 }
