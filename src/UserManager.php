@@ -60,8 +60,8 @@ class UserManager {
 			throw new Exception( 'Cannot set a password to non-existing user' );
 		}
 
-		if ( $this->passwordValid( $password ) ) {
-			throw new Exception( "Password '$password' is not valid" );
+		if ( !$this->passwordValid( $password ) ) {
+			throw new Exception( "Trying to set invalid password" );
 		}
 
 		$hash = md5( $password );
