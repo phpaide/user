@@ -36,8 +36,10 @@ class UserManager {
 			throw new Exception( 'Cannot save user: ' . $user->getName() );
 		}
 		$savedUser = new User( $user->getName(), $id );
-		$savedUser->setEmail( $user->getEmail() );
-		$savedUser->setMailVerified( $user->isEmailVerified() );
+		if ( $user->getEmail() ) {
+			$savedUser->setEmail( $user->getEmail() );
+			$savedUser->setMailVerified( $user->isEmailVerified() );
+		}
 		$savedUser->setData( $user->getData() );
 
 		return $savedUser;
