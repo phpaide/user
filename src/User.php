@@ -114,11 +114,14 @@ class User implements IUser {
 	 * @inheritDoc
 	 */
 	public function setMailVerified( bool $verified ) {
+		if ( $verified && !$this->isValidEmail( $this->email ) ) {
+			return;
+		}
 		$this->emailVerified = $verified;
 	}
 
 	protected function isValidEmail( $email ) {
-		return filter_var( $email, FILTER_VALIDATE_EMAIL );
+		return $email !== '' && filter_var( $email, FILTER_VALIDATE_EMAIL );
 	}
 
 	/**
