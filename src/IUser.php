@@ -4,6 +4,8 @@ namespace PHPAide\User;
 
 interface IUser {
 	/**
+	 * Should not be initiated directly, only through UserManager
+	 *
 	 * @param string $name
 	 * @param int $id
 	 */
@@ -74,4 +76,12 @@ interface IUser {
 	 * @param bool $verified
 	 */
 	public function setMailVerified( bool $verified );
+
+	/**
+	 * Get the copy of the current user with different id
+	 *
+	 * @param int $id
+	 * @return IUser
+	 */
+	public function cloneWithId( $id ): IUser;
 }

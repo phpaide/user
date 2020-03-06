@@ -6,10 +6,15 @@ use Exception;
 use JsonSerializable;
 
 class User implements IUser {
+	/** @var int  */
 	protected $id = 0;
+	/** @var string  */
 	protected $name = '';
+	/** @var string  */
 	protected $email = '';
+	/** @var array  */
 	protected $data = [];
+	/** @var bool  */
 	protected $emailVerified = false;
 
 	/**
@@ -114,5 +119,19 @@ class User implements IUser {
 
 	protected function isValidEmail( $email ) {
 		return filter_var( $email, FILTER_VALIDATE_EMAIL );
+	}
+
+	/**
+	 * @inheritDoc
+	 */
+	public function cloneWithId( $id ): IUser {
+		$newUser = new static( $this->getName(), $id );
+		if ( $this->getEmail() ) {
+			$newUser->setEmail( $this->getEmail() );
+			$newUser->setMailVerified( $this->isEmailVerified() );
+		}
+		$newUser->setData( $this->getData() );
+
+		return $newUser;
 	}
 }
